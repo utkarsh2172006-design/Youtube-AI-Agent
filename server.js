@@ -1759,9 +1759,13 @@ app.delete('/api/scheduled/:id', (req, res) => {
 });
 
 // ============================================================
-// START SERVER
+// START SERVER / VERCEL EXPORT
 // ============================================================
-app.listen(PORT, () => {
-  console.log(`\n🤖 AI Content Agent is running!`);
-  console.log(`📱 Open your browser: http://localhost:${PORT}\n`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`\n🤖 AI Content Agent is running!`);
+    console.log(`📱 Open your browser: http://localhost:${PORT}\n`);
+  });
+}
+
+module.exports = app;
