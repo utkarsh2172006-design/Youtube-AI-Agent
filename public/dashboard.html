@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Content Agent — Dashboard</title>
+  <meta name="description" content="AI-powered content dashboard for YouTube and Instagram." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/dashboard.css" />
+</head>
+<body>
+  <div class="bg-gradient"></div>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">✨</div>
+        <span class="logo-text">ContentAI</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" id="nav-upload" onclick="showSection('upload')">
+        <span class="nav-icon">📤</span> Upload & Post
+      </a>
+      <a href="#" class="nav-item" id="nav-research" onclick="showSection('research')">
+        <span class="nav-icon">🔍</span> Research Radar
+      </a>
+      <a href="#" class="nav-item" id="nav-schedule" onclick="showSection('schedule')">
+        <span class="nav-icon">🗓</span> Scheduler
+      </a>
+      <a href="#" class="nav-item" id="nav-ai" onclick="showSection('ai')">
+        <span class="nav-icon">🤖</span> AI Generator
+      </a>
+      <a href="#" class="nav-item" id="nav-history" onclick="showSection('history')">
+        <span class="nav-icon">📋</span> Post History
+      </a>
+    </nav>
+
+    <!-- Connected Accounts -->
+    <div class="sidebar-accounts" id="sidebarAccounts">
+      <div class="accounts-title">Connected Accounts</div>
+      <div id="accountsList"><div class="account-loading">Loading...</div></div>
+    </div>
+
+    <button type="button" class="sidebar-settings" id="btnChannelSettings" onclick="openChannelSettingsModal()" style="background:none; border:none; width:100%; text-align:left; cursor:pointer; font:inherit; color:inherit; display:flex; align-items:center; gap:8px;">
+      <span>🎨</span> Channel Defaults & Bio
+    </button>
+    <a href="/" class="sidebar-settings">
+      <span>⚙️</span> Manage Connections
+    </a>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="page-title" id="pageTitle">Upload & Post</h1>
+        <span class="page-subtitle" id="pageSubtitle">Upload your content and let AI handle the rest</span>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pills" id="statusPills"></div>
+      </div>
+    </header>
+
+    <!-- ── SECTION: UPLOAD ── -->
+    <section class="content-section active" id="section-upload">
+
+      <div class="upload-grid">
+
+        <!-- Upload Zone -->
+        <div class="upload-panel">
+          <div class="drop-zone" id="dropZone" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)">
+            <div class="drop-icon">🎬</div>
+            <h3>Drop your video here</h3>
+              <p>MP4, MOV, AVI — No size limit</p>
+            <label class="upload-file-btn">
+              <input type="file" id="videoFile" accept="video/*" onchange="handleFileSelect(event)" hidden />
+              Browse Files
+            </label>
+          </div>
+
+          <!-- File Preview -->
+          <div class="file-preview" id="filePreview" style="display:none">
+            <div class="file-preview-icon">🎬</div>
+            <div class="file-preview-info">
+              <div class="file-name" id="fileName"></div>
+              <div class="file-size" id="fileSize"></div>
+            </div>
+            <button class="file-remove" onclick="removeFile()">✕</button>
+          </div>
+
+          <!-- Platform Selection -->
+          <div class="platform-select-section">
+            <label class="section-label">Post to</label>
+            <div class="platform-toggles">
+              <label class="platform-toggle" id="ytToggle">
+                <input type="checkbox" id="postToYoutube" />
+                <span class="toggle-pill youtube-pill">
+                  <span class="toggle-icon">▶️</span> YouTube
+                </span>
+              </label>
+              <label class="platform-toggle" id="igToggle">
+                <input type="checkbox" id="postToInstagram" />
+                <span class="toggle-pill instagram-pill">
+                  <span class="toggle-icon">📸</span> Instagram
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Video Type Toggle -->
+          <div class="video-type-section">
+            <label class="section-label">Video Type</label>
+            <div class="video-type-toggles">
+              <button class="video-type-btn active" id="btnLongVideo" onclick="setVideoType('long')">
+                <span>🎬</span>
+                <div>
+                  <div class="vtype-title">Long Video</div>
+                  <div class="vtype-sub">Any length</div>
+                </div>
+              </button>
+              <button class="video-type-btn" id="btnShorts" onclick="setVideoType('shorts')">
+                <span>⚡</span>
+                <div>
+                  <div class="vtype-title">YouTube Shorts</div>
+                  <div class="vtype-sub">Under 3 mins · Vertical</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tone Selector -->
+          <div class="tone-section">
+            <label class="section-label">Content Tone</label>
+            <div class="tone-options">
+              <button class="tone-btn active" data-tone="engaging and energetic">🔥 Energetic</button>
+              <button class="tone-btn" data-tone="professional and informative">💼 Professional</button>
+              <button class="tone-btn" data-tone="funny and casual">😂 Casual</button>
+              <button class="tone-btn" data-tone="inspirational and motivational">✨ Inspirational</button>
+            </div>
+          </div>
+
+          <!-- Upload Options -->
+          <div class="upload-options-section">
+            <label class="section-label">Upload Settings</label>
+
+            <!-- Privacy -->
+            <div class="option-row">
+              <span class="option-label">🔒 Privacy</span>
+              <div class="privacy-btns">
+                <button class="privacy-btn active" data-privacy="public">🌍 Public</button>
+                <button class="privacy-btn" data-privacy="unlisted">🔗 Unlisted</button>
+                <button class="privacy-btn" data-privacy="private">🔐 Private</button>
+              </div>
+            </div>
+
+            <!-- Category -->
+            <div class="option-row">
+              <span class="option-label">🗂️ Category</span>
+              <select class="option-select" id="videoCategory">
+                <option value="20">🎮 Gaming</option>
+                <option value="22">👤 People & Blogs</option>
+                <option value="24">🎭 Entertainment</option>
+                <option value="28">💡 Science & Technology</option>
+                <option value="10">🎵 Music</option>
+                <option value="17">⚽ Sports</option>
+                <option value="25">📰 News & Politics</option>
+                <option value="27">📚 Education</option>
+                <option value="26">🤔 How-to & Style</option>
+                <option value="19">🌍 Travel & Events</option>
+              </select>
+            </div>
+
+            <!-- Notify Subscribers -->
+            <div class="option-row">
+              <span class="option-label">🔔 Notify Subscribers</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="notifySubscribers" checked />
+                <span class="toggle-track">
+                  <span class="toggle-thumb"></span>
+                </span>
+              </label>
+            </div>
+
+            <!-- Thumbnail Upload -->
+            <div class="option-row thumbnail-row">
+              <span class="option-label">🖼️ Custom Thumbnail</span>
+              <label class="thumbnail-upload-btn" id="thumbnailLabel">
+                <input type="file" id="thumbnailFile" accept="image/*" onchange="handleThumbnailSelect(event)" hidden />
+                <span id="thumbnailBtnText">📁 Upload Image</span>
+              </label>
+            </div>
+            <div id="thumbnailPreviewWrap" style="display:none; margin-top:6px;">
+              <img id="thumbnailPreview" style="width:100%; max-height:120px; object-fit:cover; border-radius:8px; border:1px solid var(--border);" />
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="notes-section">
+            <label class="section-label" for="contentNotes">Notes for AI (optional)</label>
+            <textarea id="contentNotes" class="notes-input" placeholder="E.g. 'Only AWM challenge in Grandmaster lobby, dropped at Clock Tower, got 18 kills and clutched 1v4 in final zone...'" rows="3"></textarea>
+          </div>
+
+          <!-- Generate Button -->
+          <button class="generate-btn" id="generateBtn" onclick="generateContent()">
+            <span id="generateBtnText">✨ Generate with AI</span>
+            <div class="btn-spinner" id="generateSpinner" style="display:none"></div>
+          </button>
+        </div>
+
+        <!-- AI Output Panel -->
+        <div class="output-panel" id="outputPanel">
+          <div class="output-placeholder" id="outputPlaceholder">
+            <div class="placeholder-icon">🤖</div>
+            <h3>AI will generate your content here</h3>
+            <p>Upload a video, select platforms, and click "Generate with AI"</p>
+          </div>
+
+          <div class="output-content" id="outputContent" style="display:none">
+
+            <!-- Title -->
+            <div class="output-field">
+              <div class="output-field-header">
+                <label>Title</label>
+                <div class="field-actions">
+                  <button class="alt-btn" onclick="showAlternatives('title')">↔ Alternatives</button>
+                  <button class="copy-btn" onclick="copyField('aiTitle')">📋</button>
+                </div>
+              </div>
+              <div class="editable-field" id="aiTitle" contenteditable="true"></div>
+              <div class="alternatives-panel" id="titleAlts" style="display:none"></div>
+            </div>
+
+            <!-- Caption / Description -->
+            <div class="output-field">
+              <div class="output-field-header">
+                <label>Description & Notes</label>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span id="captionCharCount" style="font-size:11px; font-weight:700; color:#4ade80;">0 / 5,000 chars</span>
+                  <button class="copy-btn" onclick="copyField('aiCaption')">📋</button>
+                </div>
+              </div>
+              <div class="editable-field" id="aiCaption" contenteditable="true" style="min-height:160px; max-height:360px; overflow-y:auto; white-space:pre-wrap; line-height:1.7;"></div>
+            </div>
+
+            <!-- Hashtags -->
+            <div class="output-field">
+              <div class="output-field-header">
+                <label>Hashtags</label>
+                <button class="copy-btn" onclick="copyField('aiHashtags')">📋</button>
+              </div>
+              <div class="hashtags-display" id="aiHashtags"></div>
+            </div>
+
+            <!-- Best Time -->
+            <div class="output-field best-time-field">
+              <span class="best-time-icon">⏰</span>
+              <div>
+                <div class="best-time-label">Best time to post</div>
+                <div class="best-time-value" id="aiBestTime"></div>
+              </div>
+            </div>
+
+            <!-- Post Actions -->
+            <div class="post-actions">
+              <button class="post-now-btn" id="postNowBtn" onclick="postNow()">
+                🚀 Post Now
+              </button>
+              <button class="schedule-post-btn" id="schedulePostBtn" onclick="openScheduleModal()">
+                🗓 Schedule
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── SECTION: RESEARCH RADAR (100% YOUTUBE END-TO-END) ── -->
+    <section class="content-section" id="section-research">
+      <div class="research-container">
+        
+        <!-- Header -->
+        <div class="research-header">
+          <div class="research-header-left">
+            <div class="radar-badge">
+              <span class="pulsing-dot"></span> 100% Real-Time YouTube Radar
+            </div>
+            <h2>🔍 YouTube Creator Research Radar</h2>
+            <p>Scan viral competitor videos, uncover explosive high-velocity outliers, and steal indexed tags in your niche.</p>
+          </div>
+          <div class="research-header-actions">
+            <div class="current-niche-pill" id="radarNichePill">🎮 Niche: Free Fire</div>
+            <button class="radar-refresh-btn" onclick="refreshResearchRadar()">
+              <span>🔄 Scan YouTube Now</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Radar View Mode Navigation Tabs -->
+        <div class="radar-view-modes">
+          <button class="radar-mode-btn active" data-mode="all" onclick="setRadarViewMode('all')">
+            <span>🌟 All 3 Radar Views</span>
+          </button>
+          <button class="radar-mode-btn" data-mode="velocity" onclick="setRadarViewMode('velocity')">
+            <span>⚡ High-Velocity Outliers</span>
+            <span class="mode-badge-count" id="modeCountVelocity">Abnormal Spikes</span>
+          </button>
+          <button class="radar-mode-btn" data-mode="relevancy" onclick="setRadarViewMode('relevancy')">
+            <span>🎯 Channel Audience Match</span>
+            <span class="mode-badge-count" id="modeCountAudience">Grounded</span>
+          </button>
+          <button class="radar-mode-btn" data-mode="trending" onclick="setRadarViewMode('trending')">
+            <span>🌐 Beyond Relevancy</span>
+            <span class="mode-badge-count" id="modeCountTrending">YouTube Trending</span>
+          </button>
+        </div>
+
+        <!-- Controls Bar -->
+        <div class="radar-controls">
+          <!-- Search input -->
+          <div class="radar-search-wrap">
+            <span class="search-icon">🔎</span>
+            <input 
+              type="text" 
+              id="radarSearchInput" 
+              class="radar-search-input" 
+              placeholder="Search any topic, weapon, or trend (e.g. AWM Headshot, Solo vs Squad, Rank Push)..." 
+              onkeydown="handleRadarSearchKey(event)"
+            />
+            <button class="radar-search-submit" onclick="executeRadarSearch()">Search YouTube</button>
+          </div>
+
+          <!-- Audience Pillars Row (Directly from Channel History) -->
+          <div class="radar-pillars-row" id="radarPillarsRow">
+            <div class="filter-group">
+              <span class="filter-label">🎯 Audience Pillars:</span>
+              <div class="filter-chips" id="audiencePillarsChips">
+                <button class="filter-chip active" data-pillar="all" onclick="setRadarPillar('all')">🔥 All Audience Pillars</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filters Row -->
+          <div class="radar-filters-row">
+            <!-- Timeframe Chips -->
+            <div class="filter-group">
+              <span class="filter-label">Timeframe:</span>
+              <div class="filter-chips" id="timeframeChips">
+                <button class="filter-chip active" data-timeframe="7d" onclick="setRadarTimeframe('7d')">📅 This Week</button>
+                <button class="filter-chip" data-timeframe="24h" onclick="setRadarTimeframe('24h')">⚡ Last 24 Hours</button>
+                <button class="filter-chip" data-timeframe="30d" onclick="setRadarTimeframe('30d')">📆 This Month</button>
+                <button class="filter-chip" data-timeframe="all" onclick="setRadarTimeframe('all')">🔥 All-Time Outliers</button>
+              </div>
+            </div>
+
+            <!-- Format Chips -->
+            <div class="filter-group">
+              <span class="filter-label">Format:</span>
+              <div class="filter-chips" id="formatChips">
+                <button class="filter-chip active" data-format="all" onclick="setRadarFormat('all')">🌐 All Formats</button>
+                <button class="filter-chip" data-format="long" onclick="setRadarFormat('long')">🎬 Long Videos</button>
+                <button class="filter-chip" data-format="shorts" onclick="setRadarFormat('shorts')">⚡ Shorts</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Radar Stats Bar -->
+        <div class="radar-summary-bar" id="radarSummaryBar">
+          <span id="radarResultCount">Showing top breakout videos</span>
+          <span id="radarCacheTime" class="cache-indicator">⚡ Cached via YouTube Data API</span>
+        </div>
+
+        <!-- Loading Skeleton -->
+        <div class="radar-loading" id="radarLoading" style="display:none">
+          <div class="radar-spinner"></div>
+          <h3>Scanning YouTube Platform Data...</h3>
+          <p>Analyzing competitor views, like ratios, subscriber multipliers, and viewer questions</p>
+        </div>
+
+        <!-- Radar Results Container (3 Specialized Discovery Sections) -->
+        <div class="radar-sections-container" id="radarSectionsContainer">
+          
+          <!-- SECTION 1: HIGH-VELOCITY OUTLIERS (High views in less time compared to normal) -->
+          <div class="radar-sub-section" id="radarSectionVelocity">
+            <div class="radar-sub-header">
+              <div class="radar-sub-title-wrap">
+                <div class="radar-sub-badge velocity-badge-color">⚡ Record-Time View Spikes</div>
+                <h3 class="radar-sub-title">⚡ High-Velocity Outliers — Exploded Faster Than Normal</h3>
+                <p class="radar-sub-desc">Videos that gained 2x–20x more views than the channel normally gets, in very few days or hours.</p>
+              </div>
+              <div class="radar-sub-pill" id="velocitySummaryPill">🔥 Abnormal Multipliers</div>
+            </div>
+            <div class="radar-grid" id="radarVelocityGrid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- SECTION 2: CHANNEL AUDIENCE RELEVANCY (Directly grounded in Utkarsh FF) -->
+          <div class="radar-sub-section" id="radarSectionAudience">
+            <div class="radar-sub-header">
+              <div class="radar-sub-title-wrap">
+                <div class="radar-sub-badge audience-badge-color">🎯 Channel Grounded</div>
+                <h3 class="radar-sub-title">🎯 Channel Audience Match — Proven Content Themes</h3>
+                <p class="radar-sub-desc">Ranked by audience affinity matching your top uploaded videos (Grandmaster Push, Secret Skill Combos, Booyah Tips).</p>
+              </div>
+              <div class="radar-sub-pill" id="audienceSummaryPill">90%–98% Match</div>
+            </div>
+            <div class="radar-grid" id="radarGrid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- SECTION 3: BEYOND RELEVANCY (YouTube Trending Chart / Macro Inspiration) -->
+          <div class="radar-sub-section" id="radarSectionTrending">
+            <div class="radar-sub-header">
+              <div class="radar-sub-title-wrap">
+                <div class="radar-sub-badge trending-badge-color">🌐 Beyond Relevancy</div>
+                <h3 class="radar-sub-title">🌐 YouTube Trending Heatmap — Macro Inspiration</h3>
+                <p class="radar-sub-desc">Top trending videos exploding across YouTube right now to inspire fresh macro hooks, viral challenges, and creative formats.</p>
+              </div>
+              <div class="radar-sub-pill">🔥 Trending on YouTube Gaming</div>
+            </div>
+            <div class="radar-grid" id="radarTrendingGrid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Empty State -->
+        <div class="radar-empty" id="radarEmpty" style="display:none">
+          <div class="empty-icon">📡</div>
+          <h3>No videos found matching this filter</h3>
+          <p>Try searching for a broader term or switching to "This Week" or "All Formats".</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── SECTION: SCHEDULE ── -->
+    <section class="content-section" id="section-schedule">
+      <div class="scheduler-container">
+        <div class="scheduler-header">
+          <div>
+            <h2>🗓 Scheduled Posts</h2>
+            <p>Videos and Shorts queued to automatically publish on YouTube.</p>
+          </div>
+          <button class="refresh-scheduler-btn" onclick="loadScheduledPosts()">🔄 Refresh</button>
+        </div>
+
+        <!-- Scheduled Posts List -->
+        <div class="scheduled-list" id="scheduledList">
+          <!-- Dynamically filled by JS -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="scheduled-empty" id="scheduledEmpty" style="display:none">
+          <div class="empty-icon">📅</div>
+          <h3>No posts currently scheduled</h3>
+          <p>When you schedule a video or Short from the Upload tab, it will appear here with a live countdown!</p>
+          <button class="empty-action-btn" onclick="showSection('upload')">➕ Schedule a Video</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION: AI GENERATOR ── -->
+    <section class="content-section" id="section-ai">
+      <div class="ai-chat-section">
+        <div class="ai-chat-header">
+          <div class="ai-avatar">🤖</div>
+          <div>
+            <h2>AI Content Assistant</h2>
+            <p>Chat with your AI to refine captions, brainstorm ideas, or generate new content</p>
+          </div>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-msg ai-msg">
+            <div class="chat-bubble">
+              👋 Hi! I'm your AI content assistant. I can help you:
+              <ul>
+                <li>Write and improve captions</li>
+                <li>Generate hashtag ideas</li>
+                <li>Create content strategies</li>
+                <li>Repurpose content for different platforms</li>
+              </ul>
+              What would you like to create today?
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <textarea class="chat-input" id="chatInput" placeholder="Ask me anything about your content..." rows="1" onkeydown="handleChatKey(event)"></textarea>
+          <button class="chat-send-btn" onclick="sendChatMessage()">Send ✨</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION: HISTORY ── -->
+    <section class="content-section" id="section-history">
+      <div class="coming-soon-card">
+        <div class="coming-soon-icon">📋</div>
+        <h2>Post History</h2>
+        <p>Track all your posted content, engagement stats, and posting history.</p>
+        <div class="coming-badge">Coming Soon</div>
+      </div>
+    </section>
+
+  <!-- ── SCHEDULE MODAL ── -->
+  <div class="modal-overlay" id="scheduleModal" style="display:none">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>🗓</span>
+          <h3>Schedule YouTube Release</h3>
+        </div>
+        <button class="modal-close-btn" onclick="closeScheduleModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-desc">
+          Your video will upload to YouTube now as <strong>Private</strong> and automatically switch to <strong>Public</strong> at your chosen release time. Your computer does not need to stay online!
+        </p>
+
+        <!-- Video summary preview -->
+        <div class="schedule-video-preview">
+          <span class="preview-type-badge" id="scheduleModalTypeBadge">⚡ Shorts</span>
+          <div class="preview-title" id="scheduleModalTitle">Video Title</div>
+        </div>
+
+        <!-- Date & Time Input -->
+        <div class="schedule-input-group">
+          <label for="scheduleDateTime">Choose Date & Time</label>
+          <input type="datetime-local" id="scheduleDateTime" class="schedule-datetime-input" />
+          <span class="timezone-hint" id="userTimezoneHint">🌐 Local time</span>
+        </div>
+
+        <!-- Quick Presets -->
+        <div class="schedule-presets">
+          <span class="presets-label">Quick Presets:</span>
+          <div class="preset-chips">
+            <button type="button" class="preset-chip" onclick="applySchedulePreset(1)">+1 Hour</button>
+            <button type="button" class="preset-chip" onclick="applySchedulePreset(3)">+3 Hours</button>
+            <button type="button" class="preset-chip" onclick="applySchedulePreset('tomorrow_evening')">Tomorrow 6 PM</button>
+            <button type="button" class="preset-chip ai-preset-chip" onclick="applyAiBestTime()">⚡ Use AI Best Time</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-cancel-btn" onclick="closeScheduleModal()">Cancel</button>
+        <button class="modal-confirm-btn" id="confirmScheduleBtn" onclick="submitSchedule()">
+          <span id="confirmScheduleText">🗓 Confirm & Schedule</span>
+          <div class="btn-spinner" id="scheduleSpinner" style="display:none"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CHANNEL SETTINGS & UPLOAD DEFAULTS MODAL ── -->
+  <div class="modal-overlay" id="channelSettingsModal" style="display:none">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>🎨</span>
+          <h3>Channel Defaults & Bio</h3>
+        </div>
+        <button class="modal-close-btn" onclick="closeChannelSettingsModal()">✕</button>
+      </div>
+
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
+        <p class="modal-desc" style="margin-bottom: 2px;">
+          Customize your channel name suffix, social links, content niche, and mandatory hashtags used across all AI generations.
+        </p>
+
+        <div class="schedule-input-group">
+          <label for="settingChannelName">Channel / Brand Suffix</label>
+          <input type="text" id="settingChannelName" class="schedule-datetime-input" placeholder="e.g. Utkarsh FF" />
+        </div>
+
+        <div class="schedule-input-group">
+          <label for="settingNiche">Content Niche / Game</label>
+          <input type="text" id="settingNiche" class="schedule-datetime-input" placeholder="e.g. Free Fire, BGMI, Cooking, Tech Reviews" />
+        </div>
+
+        <div class="schedule-input-group">
+          <label for="settingInstagram">Instagram Profile URL</label>
+          <input type="url" id="settingInstagram" class="schedule-datetime-input" placeholder="https://www.instagram.com/your_handle" />
+        </div>
+
+        <div class="schedule-input-group">
+          <label for="settingWhatsapp">WhatsApp Channel or Telegram</label>
+          <input type="url" id="settingWhatsapp" class="schedule-datetime-input" placeholder="https://whatsapp.com/channel/..." />
+        </div>
+
+        <div class="schedule-input-group">
+          <label for="settingBusinessEmail">Business Inquiry Email</label>
+          <input type="email" id="settingBusinessEmail" class="schedule-datetime-input" placeholder="contact@example.com" />
+        </div>
+
+        <div class="schedule-input-group">
+          <label for="settingHashtags">Mandatory Footer Hashtags (comma separated)</label>
+          <input type="text" id="settingHashtags" class="schedule-datetime-input" placeholder="freefire, brrankedpush, freefireindia, freefiretips, utkarshff" />
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-cancel-btn" onclick="closeChannelSettingsModal()">Cancel</button>
+        <button class="modal-confirm-btn" id="saveSettingsBtn" onclick="saveChannelSettingsFromModal()">
+          <span id="saveSettingsText">💾 Save Defaults</span>
+          <div class="btn-spinner" id="saveSettingsSpinner" style="display:none"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  </main>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

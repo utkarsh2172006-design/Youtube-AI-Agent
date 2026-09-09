@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Environment Variables & Sensitive Credentials (CRITICAL)
+.env
+.env.*
+!.env.example
+tokens.json
+client_secret*.json
+
+# Local Runtime Caches & User Channel Settings
+cache_*.json
+channel_settings.json
+
+# Uploads & Media
+uploads/*
+!uploads/.gitkeep
+
+# System & IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
